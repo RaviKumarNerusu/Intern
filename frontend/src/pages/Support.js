@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import api, { getApiErrorMessage } from "../services/api";
 
 function Support() {
   const { user } = useAuth();
@@ -20,7 +20,7 @@ function Support() {
     setError("");
 
     try {
-      const endpoint = isAdmin ? "/support" : "/support/my";
+    const endpoint = isAdmin ? "/api/support" : "/api/support/my";
       const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== "" && value !== undefined && value !== null) {
@@ -32,7 +32,7 @@ function Support() {
       setTickets(res.data.data.tickets || []);
       setPagination(res.data.data.pagination || { page: 1, pages: 1, total: 0, limit: 10 });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load support tickets");
+      setError(getApiErrorMessage(err, "Failed to load support tickets"));
     } finally {
       setLoading(false);
     }
@@ -54,12 +54,12 @@ function Support() {
     setError("");
 
     try {
-      await api.post("/support", { message: message.trim() });
+      await api.post("/api/support", { message: message.trim() });
       setMessage("");
       setToast("Support ticket created");
       await loadTickets();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create support ticket");
+      setError(getApiErrorMessage(err, "Failed to create support ticket"));
     } finally {
       setSaving(false);
     }
@@ -69,11 +69,11 @@ function Support() {
     setError("");
 
     try {
-      await api.put(`/support/${id}`, { status: "resolved" });
+      await api.put(`/api/support/${id}`, { status: "resolved" });
       setToast("Support ticket resolved");
       await loadTickets();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to resolve support ticket");
+      setError(getApiErrorMessage(err, "Failed to resolve support ticket"));
     }
   };
 

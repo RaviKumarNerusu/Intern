@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import api from "../services/api";
+import api, { getApiErrorMessage } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", { email, password });
+      const res = await api.post("/api/auth/login", { email, password });
       const nextToken = res.data.data.token;
       const nextRefreshToken = res.data.data.refreshToken;
       const nextUser = res.data.data.user;
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       return {
         ok: false,
-        message: error.response?.data?.message || "Login failed",
+        message: getApiErrorMessage(error, "Login failed"),
       };
     } finally {
       setLoading(false);
@@ -54,12 +54,12 @@ export function AuthProvider({ children }) {
   const register = async (payload) => {
     setLoading(true);
     try {
-      const res = await api.post("/auth/register", payload);
+      const res = await api.post("/api/auth/register", payload);
       return { ok: true, data: res.data.data };
     } catch (error) {
       return {
         ok: false,
-        message: error.response?.data?.message || "Registration failed",
+        message: getApiErrorMessage(error, "Registration failed"),
       };
     } finally {
       setLoading(false);
@@ -68,7 +68,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await api.post("/auth/logout");
+      await api.post("/api/auth/logout");
     } catch (error) {
       // best effort revoke; local cleanup still runs
     }

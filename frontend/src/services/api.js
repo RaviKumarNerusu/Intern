@@ -1,10 +1,23 @@
 import axios from "axios";
 
-const API_BASE_URL = (process.env.REACT_APP_API_URL || "/api").replace(/\/+$/, "");
+const API_BASE_URL = (process.env.REACT_APP_API_URL || "").replace(/\/+$/, "");
+
+export const getApiErrorMessage = (error, fallbackMessage = "Something went wrong") => {
+  const backendMessage = error?.response?.data?.message;
+
+  if (backendMessage) {
+    return backendMessage;
+  }
+
+  return fallbackMessage;
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 let isRefreshing = false;
@@ -50,9 +63,9 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           pendingRequests.push({
             resolve: (token) => {
-            originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(api(originalRequest));
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(api(originalRequest));
             },
             reject,
           });
@@ -63,7 +76,7 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-        const refreshResponse = await api.post("/auth/refresh", { refreshToken });
+        const refreshResponse = await api.post("/api/auth/refresh", { refreshToken });
         const nextToken = refreshResponse.data.data.token;
         const nextRefreshToken = refreshResponse.data.data.refreshToken || refreshToken;
 

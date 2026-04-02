@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import api from "../services/api";
+import api, { getApiErrorMessage } from "../services/api";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -27,11 +27,11 @@ function Users() {
         }
       });
 
-      const res = await api.get(`/users?${params.toString()}`);
+      const res = await api.get(`/api/users?${params.toString()}`);
       setUsers(res.data.data.users || []);
       setPagination(res.data.data.pagination || { page: 1, pages: 1, total: 0, limit: 10 });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load users");
+      setError(getApiErrorMessage(err, "Failed to load users"));
     } finally {
       setLoading(false);
     }
@@ -45,11 +45,11 @@ function Users() {
     setError("");
 
     try {
-      await api.put(`/users/${id}`, payload);
+      await api.put(`/api/users/${id}`, payload);
       setToast("User updated");
       await loadUsers();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update user");
+      setError(getApiErrorMessage(err, "Failed to update user"));
     }
   };
 
@@ -57,11 +57,11 @@ function Users() {
     setError("");
 
     try {
-      await api.delete(`/users/${id}`);
+      await api.delete(`/api/users/${id}`);
       setToast("User deleted");
       await loadUsers();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete user");
+      setError(getApiErrorMessage(err, "Failed to delete user"));
     }
   };
 

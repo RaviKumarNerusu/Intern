@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import api, { getApiErrorMessage } from "../services/api";
 
 const formatMoney = (value) => `$${Number(value || 0).toFixed(2)}`;
 
@@ -24,10 +24,10 @@ function Dashboard() {
       setError("");
 
       try {
-        const res = await api.get("/dashboard");
+        const res = await api.get("/api/dashboard");
         setData(res.data.data);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load dashboard");
+        setError(getApiErrorMessage(err, "Failed to load dashboard"));
       } finally {
         setLoading(false);
       }

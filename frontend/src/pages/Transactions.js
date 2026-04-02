@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import api, { getApiErrorMessage } from "../services/api";
 
 const getTodayValue = () => new Date().toISOString().slice(0, 10);
 
@@ -54,11 +54,11 @@ function Transactions() {
 
     try {
       const query = buildQuery();
-      const res = await api.get(`/transactions${query ? `?${query}` : ""}`);
+      const res = await api.get(`/api/transactions${query ? `?${query}` : ""}`);
       setTransactions(res.data.data.transactions || []);
       setPagination(res.data.data.pagination || { total: 0, page: 1, pages: 1, limit: 10 });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch transactions");
+      setError(getApiErrorMessage(err, "Failed to fetch transactions"));
     } finally {
       setLoading(false);
     }
@@ -103,10 +103,10 @@ function Transactions() {
       };
 
       if (editingId) {
-        await api.put(`/transactions/${editingId}`, payload);
+        await api.put(`/api/transactions/${editingId}`, payload);
         setToast("Transaction updated");
       } else {
-        await api.post("/transactions", payload);
+        await api.post("/api/transactions", payload);
         setToast("Transaction created");
       }
 
@@ -136,11 +136,11 @@ function Transactions() {
     }
 
     try {
-      await api.delete(`/transactions/${id}`);
+      await api.delete(`/api/transactions/${id}`);
       setToast("Transaction deleted");
       await loadTransactions();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete transaction");
+      setError(getApiErrorMessage(err, "Failed to delete transaction"));
     }
   };
 
