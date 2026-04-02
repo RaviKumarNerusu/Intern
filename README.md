@@ -14,7 +14,7 @@ Production-ready finance dashboard with Node.js/Express backend and React fronte
 ## Features
 
 - User management: registration, login, hashed passwords
-- Fixed admin account: `ravinerusu1@gmail.com`, auto-seeded on server start
+- Fixed admin account from environment variables (`ADMIN_EMAIL` + `ADMIN_PASSWORD`), auto-seeded on server start
 - Fixed admin cannot be created, deleted, or downgraded via API
 - RBAC roles:
   - viewer: read-only transactions
@@ -76,11 +76,20 @@ npm install
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/finance_dashboard
+MONGO_MAX_RETRIES=5
+MONGO_RETRY_DELAY_MS=3000
+MONGO_SERVER_SELECTION_TIMEOUT_MS=5000
 JWT_SECRET=replace_with_secure_secret
 JWT_EXPIRES_IN=1d
-ADMIN_EMAIL=ravinerusu1@gmail.com
+JWT_REFRESH_SECRET=replace_with_secure_refresh_secret
+JWT_REFRESH_EXPIRES_IN=7d
+ADMIN_EMAIL=admin@example.com
 ADMIN_NAME=System Administrator
 ADMIN_PASSWORD=replace_with_secure_admin_password
+FRONTEND_URL=http://localhost:3000
+CORS_ALLOWED_ORIGINS=
+SERVER_PUBLIC_URL=http://localhost:5000
+SERVE_FRONTEND=false
 NODE_ENV=development
 ```
 
@@ -188,6 +197,28 @@ Import:
 - Passwords are hashed before storage
 - JWT is required for protected routes
 - Rate limiting is enabled for `/api/*`
+- Requests are sanitized to reduce NoSQL injection risks
+- CORS uses environment-driven dynamic origin allowlisting
+
+## RBAC Matrix
+
+- `viewer`: read-only transactions
+- `analyst`: transactions + dashboard analytics
+- `admin`: full control (users, transactions, support administration)
+
+## Production Build + Deploy
+
+Build frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+Serve React static build from backend (optional):
+
+- Set `SERVE_FRONTEND=true` in backend environment
+- Backend serves `frontend/build` and falls back to `index.html`
 
 ## Cloud Deployment (Safe Secret Handling)
 

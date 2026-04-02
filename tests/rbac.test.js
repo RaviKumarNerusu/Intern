@@ -12,10 +12,24 @@ describe("RBAC", () => {
     expect(res.body.success).toBe(false);
   });
 
-  test("should allow viewer to access dashboard analytics", async () => {
+  test("should block viewer from accessing dashboard analytics", async () => {
     const { token } = await registerAndLogin({
       name: "Viewer User",
       role: "viewer",
+    });
+
+    const res = await request(app)
+      .get("/api/dashboard")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  test("should allow analyst to access dashboard analytics", async () => {
+    const { token } = await registerAndLogin({
+      name: "Analyst Dashboard User",
+      role: "analyst",
     });
 
     const res = await request(app)

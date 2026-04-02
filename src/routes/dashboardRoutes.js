@@ -9,7 +9,7 @@ const router = express.Router();
  * @swagger
  * /api/dashboard:
  *   get:
- *     summary: Dashboard analytics (viewer/analyst/admin)
+ *     summary: Dashboard analytics (analyst/admin)
  *     tags: [Dashboard]
  *     security:
  *       - bearerAuth: []
@@ -18,6 +18,6 @@ const router = express.Router();
  *         description: Dashboard data fetched
  */
 
-router.get("/", protect, authorizeRoles("viewer", "analyst", "admin"), getDashboardData);
+router.get("/", protect, authorizeRoles("analyst", "admin"), getDashboardData);
 
 module.exports = router;
