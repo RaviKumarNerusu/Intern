@@ -22,7 +22,7 @@ const ensureFixedAdmin = async () => {
     }
   );
 
-  const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
+  const existingAdmin = await User.findOne({ email: ADMIN_EMAIL }).select("+password");
 
   if (existingAdmin) {
     let needsSave = false;
@@ -39,6 +39,13 @@ const ensureFixedAdmin = async () => {
 
     if (existingAdmin.name !== ADMIN_NAME) {
       existingAdmin.name = ADMIN_NAME;
+      needsSave = true;
+    }
+
+    const passwordMatches = await existingAdmin.matchPassword(ADMIN_PASSWORD);
+
+    if (!passwordMatches) {
+      existingAdmin.password = ADMIN_PASSWORD;
       needsSave = true;
     }
 
