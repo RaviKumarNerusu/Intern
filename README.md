@@ -282,3 +282,5 @@ Final verification:
 2. Login with admin and non-admin users.
 3. Verify transactions list, dashboard summary, and RBAC behavior.
 4. Confirm no secrets are exposed in repository files.
+
+Note on Login Behavior: The backend is hosted on Render’s free tier, which may enter a sleep state after inactivity. Due to this, the first login attempt may occasionally fail or take longer as the server wakes up (cold start). Subsequent attempts work normally once the service is active. To improve reliability, a health check and retry strategy can be implemented. This behavior is expected in free-tier deployments and not related to authentication logic.
