@@ -20,7 +20,7 @@ const router = express.Router();
  * @swagger
  * /api/support:
  *   post:
- *     summary: Create a support ticket (admin only)
+ *     summary: Create a support ticket (viewer, analyst, admin)
  *     tags: [Support]
  *     security:
  *       - bearerAuth: []
@@ -65,7 +65,7 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("viewer", "analyst", "admin"),
   createSupportTicketValidation,
   validateRequest,
   createSupportTicket

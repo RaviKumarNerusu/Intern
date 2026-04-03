@@ -83,7 +83,7 @@ describe("Support API", () => {
       .set("Authorization", `Bearer ${viewer.token}`)
       .send({ message: "   " });
 
-    expect(invalidMessage.status).toBe(403);
+    expect(invalidMessage.status).toBe(400);
 
     const admin = await registerAndLogin({
       name: "Support Input Admin",
