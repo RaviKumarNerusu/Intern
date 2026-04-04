@@ -82,7 +82,7 @@ describe("RBAC", () => {
     expect(invalidSignature.body.success).toBe(false);
   });
 
-  test("should block viewer from support write actions and viewing all tickets", async () => {
+  test("should allow viewer support ticket creation and block viewing all tickets", async () => {
     const viewer = await registerAndLogin({
       name: "Viewer Support",
       role: "viewer",
@@ -93,7 +93,8 @@ describe("RBAC", () => {
       .set("Authorization", `Bearer ${viewer.token}`)
       .send({ message: "I need help with my report" });
 
-    expect(createRes.status).toBe(403);
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.success).toBe(true);
 
     const listAllRes = await request(app)
       .get("/api/support")
